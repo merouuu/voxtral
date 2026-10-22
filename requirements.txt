@@ -4,3 +4,4 @@ mistral-common[audio]
 soundfile
 scikit-learn
 matplotlib
+librosa
