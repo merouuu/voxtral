@@ -14,6 +14,7 @@ import numpy as np, torch
 from sklearn.metrics import balanced_accuracy_score, confusion_matrix
 from transformers import AutoProcessor, VoxtralForConditionalGeneration
 from data import EMOTIONS, SENTENCES, split_by_actor
+from progress import track
 
 MODEL = "mistralai/Voxtral-Mini-3B-2507"
 TASKS = {  # task: (question, meta column, labels)
@@ -77,15 +78,13 @@ def word_choice(path, question, options, list_options=True):
     return options[int(np.argmax(scores))]
 
 rows = []
-for i, c in enumerate(test):
+for i, c in enumerate(track(test, f"behavioral{suffix}")):
     for task, (question, col, labels) in TASKS.items():
         options = random.Random(i).sample(labels, len(labels))  # shuffled order, shared by both variants
         rows.append((c["path"], task, "letter", c[col], letter_choice(c["path"], question, options)))
         rows.append((c["path"], task, "word", c[col], word_choice(c["path"], question, options)))
         if task == "emotion":
             rows.append((c["path"], task, "open", c[col], word_choice(c["path"], OPEN_EMOTION, options, list_options=False)))
-    if i % 200 == 0:
-        print(f"{i}/{len(test)}", flush=True)
 
 with open(out / f"behavioral{suffix}.csv", "w", newline="") as f:
     csv.writer(f).writerows([("path", "task", "variant", "true", "pred"), *rows])

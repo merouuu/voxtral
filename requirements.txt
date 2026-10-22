@@ -5,3 +5,4 @@ soundfile
 scikit-learn
 matplotlib
 librosa
+tqdm

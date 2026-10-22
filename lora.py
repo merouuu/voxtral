@@ -42,6 +42,7 @@ def add_lora(model, path=None):
 if __name__ == "__main__":
     from transformers import AutoProcessor, VoxtralForConditionalGeneration
     from data import SENTENCES, split_by_actor
+    from progress import track
 
     MODEL = "mistralai/Voxtral-Mini-3B-2507"
     EMOTION_QUESTIONS = [
@@ -69,7 +70,7 @@ if __name__ == "__main__":
     ACCUM = 8
 
     running = 0.0
-    for step, (path, question, answer) in enumerate(examples, 1):
+    for step, (path, question, answer) in enumerate(track(examples, "lora"), 1):
         conv = [{"role": "user", "content": [{"type": "audio", "path": path}, {"type": "text", "text": question}]}]
         inp = processor.apply_chat_template(conv, return_tensors="pt").to("cuda", torch.bfloat16)
         target = torch.tensor(tok.encode(answer, add_special_tokens=False) + [tok.eos_token_id], device="cuda")

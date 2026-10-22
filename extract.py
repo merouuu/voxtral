@@ -8,6 +8,7 @@ from pathlib import Path
 import numpy as np, soundfile as sf, torch
 from transformers import AutoProcessor, VoxtralForConditionalGeneration
 from data import load_clips
+from progress import track
 
 MODEL = "mistralai/Voxtral-Mini-3B-2507"
 LAYERS = [0, 4, 8, 12, 16, 20, 24, 29]
@@ -36,7 +37,7 @@ for l in LAYERS:
     model.model.language_model.layers[l].register_forward_hook(save(f"L{l}"))
 
 feats = {}
-for i, c in enumerate(clips):
+for c in track(clips, "extract"):
     conv = [{"role": "user", "content": [{"type": "audio", "path": str(c["path"])}, {"type": "text", "text": PROMPT}]}]
     inputs = processor.apply_chat_template(conv, return_tensors="pt").to("cuda", torch.bfloat16)
     with torch.inference_mode():
@@ -50,8 +51,6 @@ for i, c in enumerate(clips):
         n = min(len(a), math.ceil(c["duration"] * (50 if name == "encoder" else 12.5)))
         feats.setdefault(name, []).append(a[:n].float().mean(0).cpu().numpy())
         feats.setdefault(f"{name}_all", []).append(a.float().mean(0).cpu().numpy())
-    if i % 500 == 0:
-        print(f"{i}/{len(clips)}", flush=True)
 
 np.savez(out / "features.npz", **{k: np.stack(v).astype(np.float16) for k, v in feats.items()})
 with open(out / "meta.csv", "w", newline="") as f:
