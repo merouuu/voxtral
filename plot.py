@@ -6,6 +6,7 @@ Usage: python plot.py outputs [en|fr] [--no-tex]   (English by default -> figure
 import csv, sys
 from pathlib import Path
 from matplotlib.lines import Line2D
+from matplotlib.patches import Patch
 import article_style as S
 
 out = Path(sys.argv[1])
@@ -17,11 +18,11 @@ TASKS = {"text": S.BLUE, "gender": S.AQUA, "emotion": S.ORANGE}
 WORDS = {
     "fr": {"text": "phrase prononcée (12 classes)", "gender": "genre (2 classes)", "emotion": "émotion (6 classes)",
            "probe": "sonde linéaire (± é.-t., 5 splits)", "answer": "réponse du modèle (zéro-shot)",
-           "human": "auditeurs humains, émotion", "x": "point de sonde (encodeur, adaptateur, couche du décodeur)",
+           "human": "humains, émotion (Cao 2014)", "x": "point de sonde (encodeur, adaptateur, couche du décodeur)",
            "y": "acc. équilibrée (norm.)", "enc": "enc.", "adapt": "ad."},
     "en": {"text": "spoken sentence (12 classes)", "gender": "gender (2 classes)", "emotion": "emotion (6 classes)",
            "probe": "linear probe (± std, 5 splits)", "answer": "model answer (zero-shot)",
-           "human": "human listeners, emotion", "x": "probe point (encoder, adapter, decoder layer)",
+           "human": "human raters, emotion (Cao 2014)", "x": "probe point (encoder, adapter, decoder layer)",
            "y": "balanced accuracy (norm.)", "enc": "enc.", "adapt": "ad."},
 }[lang]
 HUMAN_EMOTION = 100 * (0.41 - 1 / 6) / (1 - 1 / 6)  # audio-only human raters, Cao et al. 2014
@@ -58,7 +59,7 @@ ax.yaxis.set_major_formatter(S.pct(0))
 ax.set_xlabel(S.tex(WORDS["x"]))
 ax.set_ylabel(S.tex(WORDS["y"]))
 # two boxes: color = task, line style = what is measured
-tasks = [Line2D([], [], color=c, marker="o", label=S.tex(WORDS[t])) for t, c in TASKS.items()]
+tasks = [Patch(color=c, label=S.tex(WORDS[t])) for t, c in TASKS.items()]
 styles = [Line2D([], [], color=S.INK, marker="o", label=S.tex(WORDS["probe"])),
           Line2D([], [], color=S.INK, ls=S.DASH, label=S.tex(WORDS["answer"])),
           Line2D([], [], color=S.INK2, ls=S.DOT, label=S.tex(WORDS["human"]))]
