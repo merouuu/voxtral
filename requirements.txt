@@ -1,0 +1,6 @@
+torch
+transformers
+mistral-common[audio]
+soundfile
+scikit-learn
+matplotlib
