@@ -1,8 +1,9 @@
 """One Voxtral forward per CREMA-D clip -> mean-pooled activations per hook, with and without the padding mask (Q8).
 
 Usage: GPU=1 ./run.sh extract.py data/CREMA-D outputs [n_clips]
+       LORA=outputs/lora.pt GPU=1 ./run.sh extract.py data/CREMA-D outputs_lora
 """
-import csv, math, sys
+import csv, math, os, sys
 from pathlib import Path
 import numpy as np, soundfile as sf, torch
 from transformers import AutoProcessor, VoxtralForConditionalGeneration
@@ -18,6 +19,9 @@ out.mkdir(parents=True, exist_ok=True)
 
 processor = AutoProcessor.from_pretrained(MODEL)
 model = VoxtralForConditionalGeneration.from_pretrained(MODEL, dtype=torch.bfloat16).to("cuda").eval()
+if os.environ.get("LORA"):
+    from lora import add_lora
+    add_lora(model, os.environ["LORA"])
 audio_id = model.config.audio_token_id
 
 acts = {}

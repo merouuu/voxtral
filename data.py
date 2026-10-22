@@ -3,6 +3,12 @@ from pathlib import Path
 
 EMOTIONS = {"ANG": "anger", "DIS": "disgust", "FEA": "fear",
             "HAP": "happiness", "NEU": "neutral", "SAD": "sadness"}
+SENTENCES = {
+    "IEO": "It's eleven o'clock.", "TIE": "That is exactly what happened.", "IOM": "I'm on my way to the meeting.",
+    "IWW": "I wonder what this is about.", "TAI": "The airplane is almost full.", "MTI": "Maybe tomorrow it will be cold.",
+    "IWL": "I would like a new alarm clock.", "ITH": "I think I have a doctor's appointment.", "DFA": "Don't forget a jacket.",
+    "ITS": "I think I've seen this before.", "TSI": "The surface is slick.", "WSI": "We'll stop in a couple of minutes.",
+}
 
 def load_clips(root):
     root = Path(root)

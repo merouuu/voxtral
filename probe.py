@@ -1,6 +1,6 @@
 """Linear probes (L2 logistic regression) per hook and task, actor-disjoint split, normalized balanced accuracy.
 
-Usage: .venv/bin/python probe.py outputs [n_seeds]
+Usage: .venv/bin/python probe.py outputs [n_seeds] [hook,hook,...]
 """
 import csv, sys
 from pathlib import Path
@@ -17,6 +17,7 @@ TASKS = {"text": "sentence", "gender": "gender", "emotion": "emotion"}
 out = Path(sys.argv[1])
 n_seeds = int(sys.argv[2]) if len(sys.argv) > 2 else 5
 feats = np.load(out / "features.npz")
+hooks = sys.argv[3].split(",") if len(sys.argv) > 3 else feats.files
 meta = list(csv.DictReader(open(out / "meta.csv")))
 actors = np.array([int(m["actor"]) for m in meta])
 
@@ -24,7 +25,7 @@ rows = []
 for seed in range(n_seeds):
     train, test = split_by_actor([{"actor": a, "i": i} for i, a in enumerate(actors)], seed=seed)
     tr, te = [c["i"] for c in train], [c["i"] for c in test]
-    for hook in feats.files:
+    for hook in hooks:
         if hook.endswith("_all") and seed > 0:  # Q8 ablation: one seed is enough
             continue
         X = feats[hook].astype(np.float32)
@@ -42,7 +43,7 @@ for seed in range(n_seeds):
 with open(out / "probe_results.csv", "w", newline="") as f:
     w = csv.writer(f)
     w.writerow(["hook", "task", "n_seeds", "acc", "acc_norm", "std"])
-    for hook in feats.files:
+    for hook in hooks:
         for task in TASKS:
             r = np.array([(a, n) for h, t, _, a, n in rows if h == hook and t == task])
             w.writerow([hook, task, len(r), *r.mean(0).round(4), r[:, 1].std().round(4)])
