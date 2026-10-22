@@ -5,6 +5,7 @@ Usage: python plot.py outputs [en|fr] [--no-tex]   (English by default -> figure
 """
 import csv, sys
 from pathlib import Path
+from matplotlib.lines import Line2D
 import article_style as S
 
 out = Path(sys.argv[1])
@@ -14,11 +15,13 @@ S.setup_style(lang=lang, usetex="--no-tex" not in sys.argv)
 HOOKS = ["encoder", "adapter", "L0", "L4", "L8", "L12", "L16", "L20", "L24", "L29"]
 TASKS = {"text": S.BLUE, "gender": S.AQUA, "emotion": S.ORANGE}
 WORDS = {
-    "fr": {"text": "texte (12 phrases)", "gender": "genre (2)", "emotion": "émotion (6)", "probe": "sonde", "answer": "réponse",
-           "human": "humains, émotion", "x": "point de sonde (encodeur, adaptateur, couche du décodeur)",
+    "fr": {"text": "phrase prononcée (12 classes)", "gender": "genre (2 classes)", "emotion": "émotion (6 classes)",
+           "probe": "sonde linéaire (± é.-t., 5 splits)", "answer": "réponse du modèle (zéro-shot)",
+           "human": "auditeurs humains, émotion", "x": "point de sonde (encodeur, adaptateur, couche du décodeur)",
            "y": "acc. équilibrée (norm.)", "enc": "enc.", "adapt": "ad."},
-    "en": {"text": "text (12 sentences)", "gender": "gender (2)", "emotion": "emotion (6)", "probe": "probe", "answer": "answer",
-           "human": "humans, emotion", "x": "probe point (encoder, adapter, decoder layer)",
+    "en": {"text": "spoken sentence (12 classes)", "gender": "gender (2 classes)", "emotion": "emotion (6 classes)",
+           "probe": "linear probe (± std, 5 splits)", "answer": "model answer (zero-shot)",
+           "human": "human listeners, emotion", "x": "probe point (encoder, adapter, decoder layer)",
            "y": "balanced accuracy (norm.)", "enc": "enc.", "adapt": "ad."},
 }[lang]
 HUMAN_EMOTION = 100 * (0.41 - 1 / 6) / (1 - 1 / 6)  # audio-only human raters, Cao et al. 2014
@@ -32,11 +35,11 @@ x = list(range(len(HOOKS)))
 for task, color in TASKS.items():
     m = [100 * float(probes[h, task]["acc_norm"]) for h in HOOKS]
     s = [100 * float(probes[h, task]["std"]) for h in HOOKS]
-    ax.plot(x, m, color=color, marker="o", label=S.tex(f"{WORDS[task]}, {WORDS['probe']}"))
+    ax.plot(x, m, color=color, marker="o")
     ax.fill_between(x, [a - b for a, b in zip(m, s)], [a + b for a, b in zip(m, s)], color=color, alpha=0.18, lw=0)
 for task, color in TASKS.items():
-    ax.axhline(behavior[task, "letter"], color=color, ls=S.DASH, lw=1.1, label=S.tex(f"{WORDS[task]}, {WORDS['answer']}"))
-ax.axhline(HUMAN_EMOTION, color=S.INK2, ls=S.DOT, lw=0.9, label=S.tex(WORDS["human"]))
+    ax.axhline(behavior[task, "letter"], color=color, ls=S.DASH, lw=1.1)
+ax.axhline(HUMAN_EMOTION, color=S.INK2, ls=S.DOT, lw=0.9)
 
 pct_text = lambda v: f"{v:.0f} %" if lang == "fr" else f"{v:.0f}%"  # S.label escapes it for LaTeX
 
@@ -54,5 +57,11 @@ ax.set_ylim(-5, 105)
 ax.yaxis.set_major_formatter(S.pct(0))
 ax.set_xlabel(S.tex(WORDS["x"]))
 ax.set_ylabel(S.tex(WORDS["y"]))
-S.legend_out(ax)
+# two boxes: color = task, line style = what is measured
+tasks = [Line2D([], [], color=c, marker="o", label=S.tex(WORDS[t])) for t, c in TASKS.items()]
+styles = [Line2D([], [], color=S.INK, marker="o", label=S.tex(WORDS["probe"])),
+          Line2D([], [], color=S.INK, ls=S.DASH, label=S.tex(WORDS["answer"])),
+          Line2D([], [], color=S.INK2, ls=S.DOT, label=S.tex(WORDS["human"]))]
+ax.add_artist(S.legend_out(ax, handles=tasks))
+S.legend_out(ax, handles=styles, loc="lower left", bbox_to_anchor=(1.03, 0.0))
 S.save(fig, "main_figure", out_dir="figures")
