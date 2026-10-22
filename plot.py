@@ -40,11 +40,8 @@ for task, color in TASKS.items():
 
 pct_text = lambda v: f"{v:.0f} %" if lang == "fr" else f"{v:.0f}%"  # S.label escapes it for LaTeX
 
-# probe-behavior gap on emotion, at the last layer: values only, the legend names the series
+# probe-behavior gap on emotion: last-layer probe value vs model answer (values only, the legend names the series)
 top, bottom = 100 * float(probes["L29", "emotion"]["acc_norm"]), behavior["emotion", "letter"]
-ax.annotate("", xy=(x[-1] - 0.35, bottom + 1), xytext=(x[-1] - 0.35, top - 1),
-            arrowprops=dict(arrowstyle="<->", color=S.INK, lw=0.7, shrinkA=0, shrinkB=0))
-S.label(ax, x[-1] - 0.5, (top + bottom) / 2, f"{top - bottom:.0f}", ha="right", va="center")
 S.label(ax, x[-1] + 0.15, top + 3, pct_text(top), ha="center", va="bottom", color=S.ORANGE)
 S.label(ax, x[0], bottom + 2.5, pct_text(bottom), ha="left", va="bottom", color=S.ORANGE)
 
