@@ -11,6 +11,7 @@ from sklearn.model_selection import GridSearchCV, GroupKFold
 from sklearn.pipeline import make_pipeline
 from sklearn.preprocessing import StandardScaler
 from data import split_by_actor
+from progress import track
 
 TASKS = {"text": "sentence", "gender": "gender", "emotion": "emotion"}
 
@@ -25,7 +26,7 @@ rows = []
 for seed in range(n_seeds):
     train, test = split_by_actor([{"actor": a, "i": i} for i, a in enumerate(actors)], seed=seed)
     tr, te = [c["i"] for c in train], [c["i"] for c in test]
-    for hook in hooks:
+    for hook in track(hooks, f"probe seed {seed}"):
         if hook.endswith("_all") and seed > 0:  # Q8 ablation: one seed is enough
             continue
         X = feats[hook].astype(np.float32)
