@@ -1,14 +1,14 @@
 """Main figure (article style): probe accuracy along Voxtral (solid, ± std over actor splits)
 vs what the model answers zero-shot (dashed). The vertical distance on emotion is the probe-behavior gap.
 
-Usage: python plot.py outputs [fr|en] [--no-tex]
+Usage: python plot.py outputs [en|fr] [--no-tex]   (English by default -> figures/main_figure_en.*)
 """
 import csv, sys
 from pathlib import Path
 import article_style as S
 
 out = Path(sys.argv[1])
-lang = sys.argv[2] if len(sys.argv) > 2 and not sys.argv[2].startswith("--") else "fr"
+lang = sys.argv[2] if len(sys.argv) > 2 and not sys.argv[2].startswith("--") else "en"
 S.setup_style(lang=lang, usetex="--no-tex" not in sys.argv)
 
 HOOKS = ["encoder", "adapter", "L0", "L4", "L8", "L12", "L16", "L20", "L24", "L29"]
