@@ -16,10 +16,10 @@ TASKS = {"text": S.BLUE, "gender": S.AQUA, "emotion": S.ORANGE}
 WORDS = {
     "fr": {"text": "texte (12 phrases)", "gender": "genre (2)", "emotion": "émotion (6)", "probe": "sonde", "answer": "réponse",
            "human": "humains, émotion", "x": "point de sonde (encodeur, adaptateur, couche du décodeur)",
-           "y": "accuracy équilibrée, normalisée", "enc": "enc.", "adapt": "ad."},
+           "y": "acc. équilibrée (norm.)", "enc": "enc.", "adapt": "ad."},
     "en": {"text": "text (12 sentences)", "gender": "gender (2)", "emotion": "emotion (6)", "probe": "probe", "answer": "answer",
            "human": "humans, emotion", "x": "probe point (encoder, adapter, decoder layer)",
-           "y": "balanced accuracy, chance-normalized", "enc": "enc.", "adapt": "ad."},
+           "y": "balanced accuracy (norm.)", "enc": "enc.", "adapt": "ad."},
 }[lang]
 HUMAN_EMOTION = 100 * (0.41 - 1 / 6) / (1 - 1 / 6)  # audio-only human raters, Cao et al. 2014
 
