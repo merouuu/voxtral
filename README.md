@@ -21,6 +21,10 @@ Voxtral a appris uniquement à partir de transcriptions : répéter ce qui est d
 
 Tous les scores sont **normalisés** : 0 % = hasard, 100 % = parfait.
 
+![Architecture de Voxtral et points de sonde](figures/architecture_en.png)
+
+Le son passe par l'encodeur Whisper, puis l'adaptateur, puis le décodeur de langage. Les points noirs sont les endroits où l'on place une probe : ce sont les abscisses de la figure suivante.
+
 ## Résultat 1 : l'écart entre savoir et dire
 
 ![Figure principale](figures/main_figure_en.png)
@@ -65,7 +69,7 @@ Le modèle perçoit l'émotion, mais son entraînement ne lui a jamais appris à
 | `probe.py` | Entraîne les probes |
 | `behavioral.py` | Pose les questions au modèle |
 | `lora.py` | Entraîne la LoRA |
-| `plot.py`, `plot_confusion.py` | Tracent les figures |
+| `plot.py`, `plot_confusion.py`, `plot_architecture.py` | Tracent les figures |
 | `ROADMAP.md` | Le plan détaillé et les questions de recherche |
 
 ```bash
