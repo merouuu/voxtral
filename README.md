@@ -70,7 +70,7 @@ Le modèle perçoit l'émotion, mais son entraînement ne lui a jamais appris à
 | `behavioral.py` | Pose les questions au modèle |
 | `lora.py` | Entraîne la LoRA |
 | `plot.py`, `plot_confusion.py`, `plot_architecture.py` | Tracent les figures |
-| `ROADMAP.md` | Le plan détaillé et les questions de recherche |
+| `ROADMAP.md` | La question, le protocole et les réponses en bref |
 
 ```bash
 python download_cremad.py data/CREMA-D
