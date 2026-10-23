@@ -7,6 +7,7 @@ Two variants, same shuffled option order per clip:
 
 Usage: GPU=1 ./run.sh behavioral.py outputs [n_clips]
        LORA=outputs/lora.pt GPU=1 ./run.sh behavioral.py outputs   (writes *_lora.csv)
+       VARIANTS=open GPU=1 ./run.sh behavioral.py outputs            (only these variants, writes *_open.csv)
 """
 import csv, os, random, sys
 from pathlib import Path
@@ -39,6 +40,9 @@ if os.environ.get("LORA"):
     from lora import add_lora
     add_lora(model, os.environ["LORA"])
     suffix = "_lora"
+VARIANTS = os.environ.get("VARIANTS", "letter,word,open").split(",")
+if "VARIANTS" in os.environ:
+    suffix += "_" + "-".join(VARIANTS)
 letter_ids = [tok.encode(L, add_special_tokens=False) for L in LETTERS]
 assert all(len(t) == 1 for t in letter_ids), letter_ids
 letter_ids = [t[0] for t in letter_ids]
@@ -81,9 +85,11 @@ rows = []
 for i, c in enumerate(track(test, f"behavioral{suffix}")):
     for task, (question, col, labels) in TASKS.items():
         options = random.Random(i).sample(labels, len(labels))  # shuffled order, shared by both variants
-        rows.append((c["path"], task, "letter", c[col], letter_choice(c["path"], question, options)))
-        rows.append((c["path"], task, "word", c[col], word_choice(c["path"], question, options)))
-        if task == "emotion":
+        if "letter" in VARIANTS:
+            rows.append((c["path"], task, "letter", c[col], letter_choice(c["path"], question, options)))
+        if "word" in VARIANTS:
+            rows.append((c["path"], task, "word", c[col], word_choice(c["path"], question, options)))
+        if task == "emotion" and "open" in VARIANTS:
             rows.append((c["path"], task, "open", c[col], word_choice(c["path"], OPEN_EMOTION, options, list_options=False)))
 
 with open(out / f"behavioral{suffix}.csv", "w", newline="") as f:
