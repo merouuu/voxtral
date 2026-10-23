@@ -44,7 +44,7 @@ pct_text = lambda v: f"{v:.0f} %" if lang == "fr" else f"{v:.0f}%"  # S.label es
 
 # probe-behavior gap on emotion: last-layer probe value vs model answer (values only, the legend names the series)
 top, bottom = 100 * float(probes["L29", "emotion"]["acc_norm"]), behavior["emotion", "letter"]
-S.label(ax, x[-1] + 0.15, top + 3, pct_text(top), ha="center", va="bottom", color=S.ORANGE)
+S.label(ax, x[-1] + 0.2, top + 3, pct_text(top), ha="right", va="bottom", color=S.ORANGE)
 S.label(ax, x[0], bottom + 2.5, pct_text(bottom), ha="left", va="bottom", color=S.ORANGE)
 S.label(ax, x[0], lora["emotion", "open"] + 2.5, pct_text(lora["emotion", "open"]), ha="left", va="bottom", color=S.ORANGE)
 
